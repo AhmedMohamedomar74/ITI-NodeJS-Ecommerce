@@ -47,6 +47,11 @@ const userSchema = new Schema({
         type: String,
         enum: Object.values(roleEnum),
         default: roleEnum.user
+    },
+    isConfirmed : 
+    {
+        type : Boolean,
+        default : false
     }
 },
     {
