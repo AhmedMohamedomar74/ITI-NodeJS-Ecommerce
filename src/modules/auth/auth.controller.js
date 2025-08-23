@@ -16,24 +16,27 @@ export const signup = asyncHandler(async (req, res, next) => {
          * send email OTP
          * send session
          */
-
-    /**
-     * @error 
-     * the phone number save as null and same to email
-     */
-    // const { provider } = req.body
-    // if (provider != providerEnum.goole) {
+    
 
 
-    // }
-
-    const { password } = req.body
+    const { password , email, userName } = req.body
+    const findUser = await findOne({model : userModel , filter : {
+        $or: [
+            { email: email },
+            { userName: userName }
+        ]
+    }})
+    if (findUser) {
+        next(new Error("User already Exsits"), { cause: 409 })
+        return 
+    }
     if (password) {
         let n_password = await genrateHash({ plainText: password, saltRound: parseInt(process.env.HASH_SALT_ROUND) })
         req.body.password = n_password
     }
     else {
         next(new Error("there is no passowrd"), { cause: 400 })
+        return
     }
     if (req.body.email) {
         sendEmailEvent.emit("confirmEmail", { to: req.body.email, html: `<p>OTP :  ${Date.now()}</p>` })
@@ -42,8 +45,6 @@ export const signup = asyncHandler(async (req, res, next) => {
         model: userModel,
         data: req.body
     });
-
-    console.log(newUser.age)
     successResponce({ res: res, data: newUser })
     return
 })

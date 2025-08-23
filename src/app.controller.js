@@ -3,6 +3,7 @@ import authRoute from "./modules/auth/auth.route.js"
 import express from "express"
 import path from "node:path"
 import dotenv from "dotenv"
+import { glopalErrorHandling } from "./utils/glopalErrorHandling.js"
 
 
 
@@ -17,6 +18,7 @@ async function bootstrap() {
     testConnection()
     app.use(express.json())
     app.use("/auth",authRoute)
+    app.use(glopalErrorHandling)
     app.listen(port, () => {
         console.log(`Server is running on port = ${port}`)
     })
