@@ -3,8 +3,9 @@ import { asyncHandler } from "../../utils/asyncHandler.js"
 import { successResponce } from "../../utils/Response.js"
 import { create, findOne } from "../../DB/db.services.js"
 import { compareHash, genrateHash } from "../../utils/secuirty/hash.services.js"
-import { generateAuthTokens, genrateToken, selectSignatureLevel, signatureLevelEnum } from "../../utils/secuirty/token.services.js"
+import { generateAuthTokens, generateEmailTokens, genrateToken, selectSignatureLevel, signatureLevelEnum } from "../../utils/secuirty/token.services.js"
 import { sendEmailEvent } from "../../Events/sendEmail.event.js"
+import { template } from "../../utils/email.services.js"
 export const signup = asyncHandler(async (req, res, next) => {
     /**
          * @Doing
@@ -39,7 +40,8 @@ export const signup = asyncHandler(async (req, res, next) => {
         return
     }
     if (req.body.email) {
-        sendEmailEvent.emit("confirmEmail", { to: req.body.email, html: `<p>OTP :  ${Date.now()}</p>` })
+        const emailToken = generateEmailTokens(req.body)
+        sendEmailEvent.emit("confirmEmail", { to: req.body.email, html: template(emailToken.accessToken) })
     }
     const newUser = await create({
         model: userModel,

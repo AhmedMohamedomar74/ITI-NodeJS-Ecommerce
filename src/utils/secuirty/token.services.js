@@ -94,3 +94,21 @@ export const generateAuthTokens = (user) => {
     
     return { accessToken, refreshToken };
 };
+
+
+export const generateEmailTokens = (user) => {
+    const signatureLevel = user.role === roleEnum.admin 
+        ? signatureLevelEnum.admin 
+        : signatureLevelEnum.user;
+    
+    const signatures = selectSignatureLevel(signatureLevel);
+    
+    const tokenPayload = { IslogIn: true, _id: user.id  , email : user.email};
+    
+    const accessToken = genrateToken({
+        data: tokenPayload,
+        key: signatures.access,
+        options: { expiresIn: process.env.ACESS_TOKEN_EXPIRE_IN }
+    });
+    return {accessToken};
+};
