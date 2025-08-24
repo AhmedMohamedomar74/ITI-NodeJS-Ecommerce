@@ -1,6 +1,7 @@
 import { testConnection } from "./DB/connection.db.js"
 import authRoute from "./modules/auth/auth.route.js"
 import userRoute from "./modules/user/user.route.js"
+import productRoute from "./modules/productRouter.js";
 import express from "express"
 import path from "node:path"
 import dotenv from "dotenv"
@@ -20,6 +21,7 @@ async function bootstrap() {
     app.use(express.json())
     app.use("/auth",authRoute)
     app.use("/user",userRoute)
+    app.use(productRoute);
     app.use(glopalErrorHandling)
     app.listen(port, () => {
         console.log(`Server is running on port = ${port}`)
