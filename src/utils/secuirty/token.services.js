@@ -60,7 +60,7 @@ export const decodeToken = ({ selectKey = signatureKeySelectEnum.acess }) => {
 
 
         console.log(decode)
-        const findUser = await findOne({ model: userModel, filter: { _id: decode._id } })
+        const findUser = await findOne({ model: userModel, filter: { _id: decode._id , isConfirmed : true } })
         console.log({ findUser })
         if (!findUser) {
             return next(new Error("User not found", { cause: 404 }))
