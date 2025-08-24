@@ -24,6 +24,8 @@ export const validateLoginCredentials = asyncHandler(async (req, res, next) => {
         filter.email = email;
     }
 
+    filter.isConfirmed = true
+
     const user = await findOne({ model: userModel, filter });
     
     if (!user) {

@@ -56,7 +56,7 @@ export const signup = asyncHandler(async (req, res, next) => {
 
 export const login = asyncHandler(async (req, res, next) => {
     const tokens = generateAuthTokens(req.user);
-    successResponce({ res, data: tokens });
+    successResponce({ res, data: tokens.accessToken });
 })
 
 
