@@ -4,6 +4,7 @@ import { auth, refreshAuth } from "../../middelwares/auth.middleware.js";
 const router = Router()
 
 router.get("/",auth,userServices.profile)
+router.put("/",auth,userServices.updateProfile)
 router.get("/refresh-token",refreshAuth,userServices.profile)
 
 export default router

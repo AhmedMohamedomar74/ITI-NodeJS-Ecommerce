@@ -6,6 +6,7 @@ import { successResponce } from "../Response.js"
 export const signatureLevelEnum = { admin: "admin", user: "Bearer" }
 export const signatureKeySelectEnum = { acess: "acess", refresh: "refresh" }
 export const genrateToken = ({ data = {}, key = {}, options = {} }) => {
+    console.log({data,key,options})
     return jwt.sign(data, key, options)
 }
 
