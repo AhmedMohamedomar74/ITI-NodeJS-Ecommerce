@@ -2,6 +2,7 @@ import express from "express";
 import {
   createProduct,
   deleteProduct,
+  getAllProduct,
   getProduct,
   getProductById,
   updateProduct,
@@ -17,14 +18,10 @@ const productRoute = express.Router();
 productRoute.use(auth);
 
 //get product
-productRoute.get("", getProduct);
+productRoute.get("/all", getAllProduct);
 
 //get product by id
-productRoute.get(
-  "/:id",
-
-  getProductById
-);
+productRoute.get("/:id", getProductById);
 
 //create new product
 productRoute.post("", validationMiddleware(createProductSchema), createProduct);
@@ -38,5 +35,8 @@ productRoute.put(
 
 //delete product by id
 productRoute.delete("/:id", deleteProduct);
+
+//get product with pagination
+productRoute.get("", getProduct);
 
 export default productRoute;
