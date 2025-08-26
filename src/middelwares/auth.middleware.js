@@ -10,23 +10,24 @@ export const refreshAuth = decodeToken({selectKey : signatureKeySelectEnum.refre
 
 
 export const validateLoginCredentials = asyncHandler(async (req, res, next) => {
-    const { email, phoneNumber } = req.body;
+    const { email, userName } = req.body;
     
-    if (!email && !phoneNumber) {
-        return next(new Error("Email or phone number is required", { cause: 400 }));
+    if (!email && !userName) {
+        return next(new Error("Email or userName is required", { cause: 400 }));
     }
 
     const filter = {};
-    if (phoneNumber) {
-        filter.phoneNumber = phoneNumber;
-        filter.provider = providerEnum.system; // Only system users can login with phone
+    if (userName) {
+        filter.userName = userName;
+        // filter.provider = providerEnum.system; // Only system users can login with phone
     } else if (email) {
         filter.email = email;
     }
 
     filter.isConfirmed = true
-
+    console.log({filter})
     const user = await findOne({ model: userModel, filter });
+    console.log({user})
     
     if (!user) {
         return next(new Error("User not found", { cause: 404 }));
