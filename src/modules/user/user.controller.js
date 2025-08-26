@@ -50,3 +50,10 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
     }
 
 })
+
+export const deleteProfile = asyncHandler(async (req , res , next)=>
+{
+    // console.log()
+    const deletUser = await userModel.findByIdAndDelete(req.user._id)
+    successResponce({res:res , data:deletUser})
+})
