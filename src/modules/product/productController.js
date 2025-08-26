@@ -3,9 +3,28 @@ import asyncHandler from "express-async-handler";
 import { roleEnum } from "../../DB/models/User.model.js";
 
 //GET ==> get all products
-const getProduct = asyncHandler(async (req, res, next) => {
+const getAllProduct = asyncHandler(async (req, res, next) => {
   const products = await productModel.find();
   res.status(200).json({ message: "All Product", data: products });
+});
+
+//GET ==> get all product with pagination
+const getProduct = asyncHandler(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const totalProducts = await productModel.countDocuments();
+
+  const products = await productModel.find().skip(skip).limit(limit);
+
+  res.status(200).json({
+    message: "All products",
+    page,
+    totalPages: Math.ceil(totalProducts / limit),
+    totalProducts,
+    data: products,
+  });
 });
 
 //GET ==> get else product using by id
@@ -76,6 +95,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 export {
+  getAllProduct,
   getProduct,
   getProductById,
   createProduct,
