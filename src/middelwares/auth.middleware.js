@@ -1,5 +1,5 @@
 import { findOne } from "../DB/db.services.js";
-import userModel from "../DB/models/User.model.js";
+import userModel, { roleEnum } from "../DB/models/User.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { compareHash } from "../utils/secuirty/hash.services.js";
 import { decodeToken, signatureKeySelectEnum} from "../utils/secuirty/token.services.js"
@@ -57,3 +57,15 @@ export const validatePassword = asyncHandler(async (req, res, next) => {
 
     next();
 });
+
+
+export const adminCheckmiddelware = asyncHandler(async (req,res,next)=>
+{
+    if (req.user.role == roleEnum.admin) {
+        next()
+    }
+    else
+    {
+        next(new Error("Unothrized User"),{cause:401})
+    }
+})
