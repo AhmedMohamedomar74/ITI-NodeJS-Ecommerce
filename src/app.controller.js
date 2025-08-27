@@ -17,9 +17,10 @@ async function bootstrap() {
   // DB
   testConnection();
   app.use(express.json());
+  app.use("/images", express.static("images"));
   app.use("/auth", authRoute);
   app.use("/user", userRoute);
-  app.use("/products",productRoute);
+  app.use("/products", productRoute);
   app.use(glopalErrorHandling);
   app.listen(port, () => {
     console.log(`Server is running on port = ${port}`);
