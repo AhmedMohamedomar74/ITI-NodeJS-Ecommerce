@@ -40,6 +40,10 @@ const getProductById = asyncHandler(async (req, res, next) => {
 //POST ==> create new product
 const createProduct = asyncHandler(async (req, res, next) => {
   if (req.user.role === roleEnum.admin) {
+    if (req.file) {
+      req.body.images = [req.file.filename];
+    }
+
     const product = await productModel.insertMany(req.body);
     res
       .status(201)
@@ -53,6 +57,10 @@ const createProduct = asyncHandler(async (req, res, next) => {
 const updateProduct = asyncHandler(async (req, res) => {
   if (req.user.role === roleEnum.admin) {
     const { id } = req.params;
+
+    if (req.file) {
+      req.body.images = [req.file.filename];
+    }
 
     const updatedProduct = await productModel.findByIdAndUpdate(
       id,

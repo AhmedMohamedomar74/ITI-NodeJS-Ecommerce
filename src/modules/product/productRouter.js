@@ -13,6 +13,7 @@ import {
   createProductSchema,
   updateProductSchema,
 } from "../../validations/productValidation.js";
+import upload from "../../middelwares/upload.middleware.js";
 
 const productRoute = express.Router();
 productRoute.use(auth);
@@ -24,11 +25,17 @@ productRoute.get("/all", getAllProduct);
 productRoute.get("/:id", getProductById);
 
 //create new product
-productRoute.post("", validationMiddleware(createProductSchema), createProduct);
+productRoute.post(
+  "",
+  validationMiddleware(createProductSchema),
+  upload.single("image"),
+  createProduct
+);
 
 //upadate product by id
 productRoute.put(
   "/:id",
+  upload.single("image"),
   validationMiddleware(updateProductSchema),
   updateProduct
 );
