@@ -7,7 +7,10 @@ import {
   getProductById,
   updateProduct,
 } from "./productController.js";
-import { auth } from "../../middelwares/auth.middleware.js";
+import {
+  adminCheckmiddelware,
+  auth,
+} from "../../middelwares/auth.middleware.js";
 import { validationMiddleware } from "../../middelwares/validation.middleware.js";
 import {
   createProductSchema,
@@ -27,6 +30,7 @@ productRoute.get("/:id", getProductById);
 //create new product
 productRoute.post(
   "",
+  adminCheckmiddelware,
   validationMiddleware(createProductSchema),
   upload.single("image"),
   createProduct
@@ -35,13 +39,14 @@ productRoute.post(
 //upadate product by id
 productRoute.put(
   "/:id",
+  adminCheckmiddelware,
   upload.single("image"),
   validationMiddleware(updateProductSchema),
   updateProduct
 );
 
 //delete product by id
-productRoute.delete("/:id", deleteProduct);
+productRoute.delete("/:id", adminCheckmiddelware, deleteProduct);
 
 //get product with pagination
 productRoute.get("", getProduct);
