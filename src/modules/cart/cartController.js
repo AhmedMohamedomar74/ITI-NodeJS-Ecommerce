@@ -1,8 +1,7 @@
-// controllers/cart.controller.js
 import cartModel from "../../DB/models/cartModel.js";
 import asyncHandler from "express-async-handler";
 
-// ➕ Add item
+//  Add item
 const addToCart = asyncHandler(async (req, res) => {
   const { productId, quantity } = req.body;
   const userId = req.user._id;
@@ -27,7 +26,7 @@ const addToCart = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Item added to cart", data: cart });
 });
 
-// 🗑️ Remove item
+// Remove item
 const removeFromCart = asyncHandler(async (req, res) => {
   const { productId } = req.body;
   const userId = req.user._id;
@@ -43,7 +42,7 @@ const removeFromCart = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Item removed", data: cart });
 });
 
-// ✏️ Update quantity
+// Update quantity
 const updateQuantity = asyncHandler(async (req, res) => {
   const { productId, quantity } = req.body;
   const userId = req.user._id;
@@ -65,7 +64,7 @@ const updateQuantity = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Cart updated", data: cart });
 });
 
-// 📜 Get user cart
+// Get user cart
 const getCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   let cart = await cartModel.findOne({ userId }).populate("items.productId");
