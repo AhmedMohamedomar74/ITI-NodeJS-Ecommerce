@@ -3,45 +3,58 @@ import Cart from "./../../DB/models/cartModel.js";
 
 export const placeOrder = async (req, res) => {
   try {
-    const userId = req.user._id; // from JWT
+    const userId = req.user._id;
+    
+    // Get cart with populated product details
     const cart = await Cart.findOne({ userId })
-    console.log({cart})
-    if (!cart || cart.products.length === 0) {
+      .populate({
+        path: "items.productId",
+        select: "name price" // Only populate necessary fields
+      });
+
+    if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    // Calculate total
-    const totalPrice = cart.products.reduce((acc, item) => {
-      return acc + item.productId.price * item.quantity;
+    // Calculate total price
+    const totalPrice = cart.items.reduce((acc, item) => {
+      return acc + (item.productId.price * item.quantity);
     }, 0);
 
-    // Create order
+    // Create order - note the field name corrections
     const newOrder = await Order.create({
-      userId,
-      products: cart.products.map(item => ({
-        productId: item.productId._id,
+      Userid: userId, // Note: your schema uses 'Userid' not 'userId'
+      products: cart.items.map(item => ({
+        productsId: item.productId._id, // Note: your schema uses 'productsId' not 'productId'
         quantity: item.quantity,
         price: item.productId.price
       })),
       totalPrice
     });
 
-    // Clear cart after order
-    cart.products = [];
+    // Clear cart after successful order
+    cart.items = [];
     await cart.save();
 
-    res.status(201).json({ message: "Order placed successfully", order: newOrder });
+    res.status(201).json({ 
+      message: "Order placed successfully", 
+      order: newOrder 
+    });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error });
+    console.error("Order placement error:", error);
+    res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };
 
 export const getMyOrders = async (req, res) => {
   try {
     const userId = req.user._id;
-    const orders = await Order.find({ userId }).populate("products.productId");
+    const orders = await Order.find({ Userid: userId }) // Use 'Userid' to match schema
+      .populate("products.productsId"); // Use 'productsId' to match schema
+    
     res.json({ orders });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error });
+    console.error("Get orders error:", error);
+    res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };
