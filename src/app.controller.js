@@ -8,6 +8,7 @@ import express from "express";
 import path from "node:path";
 import dotenv from "dotenv";
 import { glopalErrorHandling } from "./utils/glopalErrorHandling.js";
+import orderRouter from "./modules/order/order.route.js";
 
 async function bootstrap() {
   dotenv.config({
@@ -23,6 +24,7 @@ async function bootstrap() {
   app.use("/user", userRoute);
   app.use("/products",productRoute);
   app.use("/category",categoryRouter)
+  app.use("/orders", orderRouter); 
   app.use("/",cartRouter);
   app.use(glopalErrorHandling);
   app.listen(port, () => {
