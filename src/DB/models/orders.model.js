@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { updateQuantity } from "../../modules/cart/cartController";
 
 const orderSchema = new mongoose.Schema({
     Userid: {

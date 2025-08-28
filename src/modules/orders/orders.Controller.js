@@ -1,11 +1,11 @@
-import Order from "../models/order.model.js";
-import Cart from "../models/cart.model.js";
+import Order from "./../../DB/models/orders.model.js";
+import Cart from "./../../DB/models/cartModel.js";
 
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user._id; // from JWT
-    const cart = await Cart.findOne({ userId }).populate("products.productId");
-
+    const cart = await Cart.findOne({ userId })
+    console.log({cart})
     if (!cart || cart.products.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }

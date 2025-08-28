@@ -8,7 +8,7 @@ import express from "express";
 import path from "node:path";
 import dotenv from "dotenv";
 import { glopalErrorHandling } from "./utils/glopalErrorHandling.js";
-import orderRouter from "./modules/order/order.route.js";
+import orderRouter from "./modules/orders/orders.route.js";
 
 async function bootstrap() {
   dotenv.config({
