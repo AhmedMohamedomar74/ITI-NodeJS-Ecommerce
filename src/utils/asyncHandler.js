@@ -5,7 +5,8 @@ export const asyncHandler = (fn)=>
         try {
             await fn(req,res,next)
         } catch (error) {
-            next(error,{cause : 500})
+            // console.log({status : error.cause})
+            next(error,{cause : error.cause})
         }
     }
 }
