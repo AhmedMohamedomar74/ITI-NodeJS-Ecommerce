@@ -10,6 +10,7 @@ import path from "node:path";
 import dotenv from "dotenv";
 import { glopalErrorHandling } from "./utils/glopalErrorHandling.js";
 import orderRouter from "./modules/orders/orders.route.js";
+import cors from "cors"; // Import cors package
 
 async function bootstrap() {
   dotenv.config({
@@ -17,6 +18,13 @@ async function bootstrap() {
   });
   const port = process.env.PORT;
   const app = express();
+
+  app.use(cors({
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
+    credentials: true
+  }));
 
   // DB
   testConnection();

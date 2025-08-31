@@ -4,51 +4,83 @@ import ordersModel from "../../DB/models/orders.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { successResponce } from "../../utils/Response.js";
 import * as paypal from "./PayPal-Componnet/paypal.js"
+import axios from 'axios';
+import qs from 'querystring';
 
 export const placeOrder = asyncHandler(async (req, res, next) => {
-    const { _id } = req.user
-    // console.log(_id)
+    const { _id } = req.user;
+
     const order = await findOne({
-        model: ordersModel, filter:
-        {
-            Userid: _id
-        }
-    })
-    console.log({ order })
-    if (order == null) {
-        // console.log({order})
-        next(new Error("no order found"), { cause: 400 })
-        return
+        model: ordersModel,
+        filter: { Userid: _id }
+    });
+
+    if (!order) {
+        return next(new Error("No order found", { cause: 400 }));
     }
-    const Payment = await paypal.createOrder(order, "USD");
-    console.log({Payment})
-    const UpdateOrder = await ordersModel.findByIdAndUpdate(order._id , {
-        $set:{PaymentID: Payment.id},
-        $inc : {__v : 1}
-    })
-    console.log({UpdateOrder}) 
+
+    const appreovHref = await paypal.CreateOrder({value : order.totalPrice})  
+    console.log({appreovHref })
+    // Create payment record (you might want to store the PayPal order ID)
+    const UpdateOrder = await ordersModel.findByIdAndUpdate(order._id, {
+        $set: {
+            status: "pending",
+        },
+        $inc: { __v: 1 }
+    });
+
     successResponce({
-        res: res, status: 200, data: {
-            PaymentID: Payment.id,
-            status: Payment.status,
-            links: Payment.links
-        }
-    })
-})
+        res: res,
+        status: 200,
+        data: appreovHref
+    });
+});
 
 export const confirmOrder = asyncHandler(async (req, res, next) => {
-    const OrderID  = req.query.OrderID
-    // console.log(req.user)
-    const order = await ordersModel.findByIdAndUpdate(OrderID , {
-        $set : {
-            status : "completed"
-        },
-        $inc:{
-            __v : 1
-        }
-    })
-    successResponce({data : order ,res: res, status: 200})
-    console.log({ order })
+    const orderId = req.query.token
+    const response = await paypal.captureOrder(orderId)
+    successResponce({res : res , status : 200 , data : response})
 })
 
 // return_url: `${process.env.BASE_URL}/api/v1/payment/confirmOrder?userId=${userId}&token=${encodeURIComponent(token)}`,
+
+
+async function orderRequest(value) {
+    const accessToken = await paypal.genratPayPalToken();
+
+    const orderData = {
+        intent: "CAPTURE",
+        purchase_units: [
+            {
+                amount: {
+                    currency_code: "USD",
+                    value: value
+                }
+            }
+        ],
+        application_context: {
+            return_url: `${process.env.BASE_URL}:${process.env.PORT}/api/v1/payment/confirmOrder`,
+            cancel_url: `${process.env.BASE_URL}:${process.env.PORT}/cancel`,
+            shipping_preference: 'NO_SHIPPING',
+            user_action: 'PAY_NOW',
+            brand_name: 'ITI Mearn Stack'
+        }
+    };
+
+    const response = await axios.post(
+        'https://api-m.sandbox.paypal.com/v2/checkout/orders',
+        orderData,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const createdOrder = response.data;
+    const approveLink = createdOrder.links.find(link => link.rel === "approve");
+    const appreovHref = approveLink.href;
+
+    return appreovHref
+}

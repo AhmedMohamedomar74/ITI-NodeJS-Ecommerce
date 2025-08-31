@@ -1,81 +1,116 @@
-import * as paypalSdk from '@paypal/checkout-server-sdk';
+import { asyncHandler } from "./../../../utils/asyncHandler.js";
+import axios from 'axios';
+import qs from 'querystring';
 
-// Destructure the needed classes from the SDK
-const { orders } = paypalSdk.default;
-import client from './paypalClient.js';
-import { genrateToken } from '../../../utils/secuirty/token.services.js';
-// Create order
-export const createOrder = async function createOrder(order, currency = 'USD') {
-    const request = new orders.OrdersCreateRequest();
-    request.prefer("return=representation");
-    request.requestBody({
-        intent: 'CAPTURE',
-        purchase_units: [{
-            amount: {
-                currency_code: currency,
-                value: order.totalPrice,
-                breakdown: {
-                    item_total: {
-                        currency_code: currency,
-                        value: order.totalPrice
-                    }
-                }
-            },
-            items: [
-                {
-                    name: "Test Item",
-                    description: "Test Item Description",
-                    quantity: "1",
-                    unit_amount: {
-                        currency_code: currency,
-                        value: order.totalPrice
-                    }
-                }
-            ]
-        }],
-        application_context: {
-            brand_name: "Your Store Name",
-            landing_page: "BILLING",
-            user_action: "PAY_NOW",
-            return_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/confirmOrder?OrderID=${order._id}`,
-            cancel_url: `${process.env.BASE_URL}:${process.env.PORT}`
-        }
+export const genratPayPalToken = async () => {
+    const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+    const CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
+    const response = await axios({
+        method: 'post',
+        url: 'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+        },
+        auth: {
+            username: CLIENT_ID,
+            password: CLIENT_SECRET
+        },
+        data: qs.stringify({
+            grant_type: 'client_credentials'
+        })
     });
 
-    console.log(request)
-    try {
-        const order = await client().execute(request);
-        return order.result;
-    } catch (error) {
-        console.error('Error creating order:', error);
-        throw error;
-    }
+    return response.data.access_token;
 }
 
-// Capture order
-export const captureOrder = async function captureOrder(orderID) {
-    const request = new orders.OrdersCaptureRequest(orderID);
-    request.requestBody({});
+export const CreateOrder = async ({ currency_code = "USD", value }) => {
+    const accessToken = await genratPayPalToken();
+    
+    const orderData = {
+        intent: "CAPTURE",
+        purchase_units: [
+            {
+                amount: {
+                    currency_code: currency_code,
+                    value: value
+                }
+            }
+        ],
+        application_context: {
+            return_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/confirmOrder`,
+            cancel_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/cancel`,
+            shipping_preference: 'NO_SHIPPING',
+            user_action: 'PAY_NOW',
+            brand_name: 'ITI Mearn Stack'
+        }
+    };
 
-    try {
-        const capture = await client().execute(request);
-        return capture.result;
-    } catch (error) {
-        console.error('Error capturing order:', error);
-        throw error;
-    }
+    const response = await axios.post(
+        'https://api-m.sandbox.paypal.com/v2/checkout/orders',
+        orderData,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const createdOrder = response.data;
+    const approveLink = createdOrder.links.find(link => link.rel === "approve");
+    const appreovHref = approveLink.href;
+    
+    console.log({ createdOrder, approveLink, appreovHref });
+    
+    // Return an object with the href instead of just the string
+    return appreovHref
 }
 
-// Get order details
-export const getOrder = async function getOrder(orderID) {
-    const request = new orders.OrdersGetRequest(orderID);
+export const captureOrder = async (orderId) => {
+    const accessToken = await genratPayPalToken();
+    console.log({ accessTokenInCaptureOrder: accessToken, orderId });
 
-    try {
-        const order = await client().execute(request);
-        return order.result;
-    } catch (error) {
-        console.error('Error getting order:', error);
-        throw error;
+    // 1. Check order status (Optional but good practice)
+    const orderDetails = await axios.get(
+        `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        }
+    );
+    console.log("Order Status before capture:", orderDetails.data.status);
+
+    // Optional: Check if it's already completed to avoid errors
+    if (orderDetails.data.status === "COMPLETED") {
+        console.log("Order is already COMPLETED.");
+        return orderDetails.data; // Return the completed order data
     }
-}
+
+    if (orderDetails.data.status !== "APPROVED") {
+        throw new Error(`Cannot capture order. Order status is: ${orderDetails.data.status}. It must be APPROVED.`);
+    }
+
+    // 2. THIS IS THE CRITICAL PART: MAKE THE CAPTURE REQUEST
+    const response = await axios.post(
+        `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`,
+        {}, // Empty request body for a full capture
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+                'Prefer': 'return=representation' // Tells PayPal to send the full order details in the response
+            }
+        }
+    );
+
+    // 3. The response from the CAPTURE call will have status: "COMPLETED"
+    const capturedOrder = response.data;
+    console.log("Order Status after capture:", capturedOrder.status); // This will now be "COMPLETED"
+
+    // 4. Return the full capture response, not just the status
+    return capturedOrder;
+};
