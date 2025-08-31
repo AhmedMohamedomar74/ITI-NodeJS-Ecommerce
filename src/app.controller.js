@@ -4,6 +4,7 @@ import userRoute from "./modules/user/user.route.js";
 import productRoute from "./modules/product/productRouter.js";
 import cartRouter from "./modules/cart/cartRoute.js";
 import categoryRouter from "./modules/category/category.route.js"
+import paymentRoute from "./modules/payment/payment.route.js"
 import express from "express";
 import path from "node:path";
 import dotenv from "dotenv";
@@ -27,6 +28,7 @@ async function bootstrap() {
   app.use("/category",categoryRouter)
   app.use("/orders", orderRouter); 
   app.use("/",cartRouter);
+  app.use("/payment",paymentRoute)
   app.use(glopalErrorHandling);
   app.listen(port, () => {
     console.log(`Server is running on port = ${port}`);

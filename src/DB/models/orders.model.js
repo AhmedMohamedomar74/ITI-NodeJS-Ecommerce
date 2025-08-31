@@ -13,7 +13,10 @@ const orderSchema = new mongoose.Schema({
         price : {type : Number , require : true} 
     }],
     totalPrice: {type : Number , require : true},
-    status: { type: String, enum: ["pending", "completed", "cancelled"], default: "pending" }
+    status: { type: String, enum: ["pending", "completed", "cancelled"], default: "pending" },
+    PaymentID : {
+        type : String
+    }
 } ,{ timestamps: true })
 
 export default mongoose.model("Orders" , orderSchema)

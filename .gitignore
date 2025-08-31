@@ -5,3 +5,4 @@ DB/*
 !DB/.gitkeep
 package-lock.json
 src/images
+notes.txt
