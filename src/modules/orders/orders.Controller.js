@@ -78,11 +78,14 @@ export const placeOrder = async (req, res) => {
       });
 
       // Deduct stock
-      for (const item of cart.items) {
-        const product = await productModel.findById(item.productId._id);
-        product.quantity -= item.quantity;
-        await product.save();
-      }
+      if (order.status === "complete") {
+  for (const item of order.products) {
+    const product = await productModel.findById(item.productsId);
+    product.quantity -= item.quantity;
+    await product.save();
+  }
+}
+
     }
 
     // Clear the cart
@@ -109,6 +112,8 @@ export const placeOrder = async (req, res) => {
     res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };
+
+
 
 export const getMyOrders = async (req, res) => {
   try {
