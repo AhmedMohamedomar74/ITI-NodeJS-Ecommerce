@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post("/placeOrder",auth,paymentContoller.placeOrder)
 router.get("/confirmOrder",paymentContoller.confirmOrder)
+router.get("/cancelOrder",paymentContoller.cancelOrder)
 
 export default router

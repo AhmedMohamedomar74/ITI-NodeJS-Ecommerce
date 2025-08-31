@@ -25,7 +25,7 @@ export const genratPayPalToken = async () => {
     return response.data.access_token;
 }
 
-export const CreateOrder = async ({ currency_code = "USD", value }) => {
+export const CreateOrder = async ({ currency_code = "USD", value , user_id }) => {
     const accessToken = await genratPayPalToken();
 
     const orderData = {
@@ -39,8 +39,8 @@ export const CreateOrder = async ({ currency_code = "USD", value }) => {
             }
         ],
         application_context: {
-            return_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/confirmOrder`,
-            cancel_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/cancel`,
+            return_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/confirmOrder?user_id=${user_id}`,
+            cancel_url: `${process.env.BASE_URL}:${process.env.PORT}/payment/cancelOrder?user_id=${user_id}`,
             shipping_preference: 'NO_SHIPPING',
             user_action: 'PAY_NOW',
             brand_name: 'ITI Mearn Stack'

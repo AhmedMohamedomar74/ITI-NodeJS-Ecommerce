@@ -19,8 +19,8 @@ export const placeOrder = asyncHandler(async (req, res, next) => {
         return next(new Error("No order found", { cause: 400 }));
     }
 
-    const appreovHref = await paypal.CreateOrder({value : order.totalPrice})  
-    console.log({appreovHref })
+    const appreovHref = await paypal.CreateOrder({ value: order.totalPrice, user_id: _id })
+    console.log({ appreovHref })
     // Create payment record (you might want to store the PayPal order ID)
     const UpdateOrder = await ordersModel.findByIdAndUpdate(order._id, {
         $set: {
@@ -38,8 +38,45 @@ export const placeOrder = asyncHandler(async (req, res, next) => {
 
 export const confirmOrder = asyncHandler(async (req, res, next) => {
     const orderId = req.query.token
+    const userID = req.query.user_id
     const response = await paypal.captureOrder(orderId)
-    successResponce({res : res , status : 200 , data : response})
+
+    if (response == "APPROVED") {
+        const order = await ordersModel.findOneAndUpdate({
+            Userid: userID
+        }, {
+            $set: {
+                status: "completed"
+            },
+            $inc: {
+                __v: 1
+            }
+        })
+        // console.log({order})
+    }
+
+    successResponce({ res: res, status: 200, data: response })
+})
+
+
+
+
+export const cancelOrder = asyncHandler(async (req, res, next) => {
+    const orderId = req.query.token
+    const userID = req.query.user_id
+    // const response = await paypal.captureOrder(orderId)
+    const order = await ordersModel.findOneAndUpdate({
+        Userid: userID
+    }, {
+        $set: {
+            status: "cancelled"
+        },
+        $inc: {
+            __v: 1
+        }
+    })
+    console.log({order})
+    successResponce({ res: res, status: 200, message: "Order Cancelled successfully" })
 })
 
 // return_url: `${process.env.BASE_URL}/api/v1/payment/confirmOrder?userId=${userId}&token=${encodeURIComponent(token)}`,
