@@ -27,7 +27,7 @@ export const genratPayPalToken = async () => {
 
 export const CreateOrder = async ({ currency_code = "USD", value }) => {
     const accessToken = await genratPayPalToken();
-    
+
     const orderData = {
         intent: "CAPTURE",
         purchase_units: [
@@ -61,9 +61,9 @@ export const CreateOrder = async ({ currency_code = "USD", value }) => {
     const createdOrder = response.data;
     const approveLink = createdOrder.links.find(link => link.rel === "approve");
     const appreovHref = approveLink.href;
-    
+
     console.log({ createdOrder, approveLink, appreovHref });
-    
+
     // Return an object with the href instead of just the string
     return appreovHref
 }
@@ -95,22 +95,22 @@ export const captureOrder = async (orderId) => {
     }
 
     // 2. THIS IS THE CRITICAL PART: MAKE THE CAPTURE REQUEST
-    const response = await axios.post(
-        `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`,
-        {}, // Empty request body for a full capture
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`,
-                'Prefer': 'return=representation' // Tells PayPal to send the full order details in the response
-            }
-        }
-    );
+    // const response = await axios.post(
+    //     `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`,
+    //     {}, // Empty request body for a full capture
+    //     {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${accessToken}`,
+    //             'Prefer': 'return=representation' // Tells PayPal to send the full order details in the response
+    //         }
+    //     }
+    // );
 
-    // 3. The response from the CAPTURE call will have status: "COMPLETED"
-    const capturedOrder = response.data;
-    console.log("Order Status after capture:", capturedOrder.status); // This will now be "COMPLETED"
+    // // 3. The response from the CAPTURE call will have status: "COMPLETED"
+    // const capturedOrder = response.data;
+    // console.log("Order Status after capture:", capturedOrder.status); // This will now be "COMPLETED"
 
-    // 4. Return the full capture response, not just the status
-    return capturedOrder;
+    // // 4. Return the full capture response, not just the status
+    return orderDetails.data.status;
 };
