@@ -31,8 +31,8 @@ productRoute.get("/:id", getProductById);
 productRoute.post(
   "",
   adminCheckmiddelware,
-  validationMiddleware(createProductSchema),
   upload.single("image"),
+  validationMiddleware(createProductSchema),
   createProduct
 );
 
