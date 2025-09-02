@@ -1,6 +1,7 @@
 import { findOne } from "../../DB/db.services.js";
 import cartModel from "../../DB/models/cartModel.js";
 import ordersModel from "../../DB/models/orders.model.js";
+import productModel from "../../DB/models/productModel.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { successResponce } from "../../utils/Response.js";
 import * as paypal from "./PayPal-Componnet/paypal.js"
@@ -52,6 +53,23 @@ export const confirmOrder = asyncHandler(async (req, res, next) => {
                 __v: 1
             }
         })
+
+        for (const item of order.products) {
+            const product = await productModel.findById(item.productsId);
+            console.log({product})
+            if (!product) {
+                return next(new Error(`Product not found: ${item.productsId}`, { cause: 404 }));
+            }
+            if (product.quantity < item.quantity) {
+                return next(new Error(`Insufficient stock for product: ${product.name}`, { cause: 400 }));
+            }
+
+            await productModel.findByIdAndUpdate(
+                item.productsId,
+                { $inc: { quantity: -item.quantity } },
+                { new: true }
+            );
+        }
         // console.log({order})
     }
 
