@@ -59,7 +59,7 @@ src/
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/AhmedMohamedomar74/ITI-NodeJS-Ecommerce.git
 ```
 
 2. Install dependencies:
