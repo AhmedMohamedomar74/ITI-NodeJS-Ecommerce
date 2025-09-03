@@ -15,7 +15,7 @@ A RESTful API for an e-commerce platform built with Node.js, Express, and MongoD
 - **Payment Integration**: PayPal API
 
 ## Database Schema
-![Database Schema](media\DB_Scehma.png)
+![Database Schema](media/DB_Scehma.png)
 
 The database design consists of 5 main collections:
 - **Users**: Stores user information and authentication details
