@@ -1,6 +1,6 @@
 node_modules
-# config/*
-# !config/.gitkeep
+config/*
+!config/.gitkeep
 DB/*
 !DB/.gitkeep
 package-lock.json
