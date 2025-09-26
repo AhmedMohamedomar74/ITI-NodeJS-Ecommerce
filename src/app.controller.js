@@ -14,7 +14,7 @@ import cors from "cors"; // Import cors package
 
 async function bootstrap() {
   dotenv.config({
-    path: path.resolve("./config/dev.env"),
+    // path: path.resolve("./config/dev.env"),
   });
   const port = process.env.PORT || 5000;
   const app = express();

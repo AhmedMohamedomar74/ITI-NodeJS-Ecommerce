@@ -6,3 +6,4 @@ DB/*
 package-lock.json
 src/images
 notes.txt
+.env
