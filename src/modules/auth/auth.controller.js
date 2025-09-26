@@ -31,7 +31,7 @@ export const signup = asyncHandler(async (req, res, next) => {
         }
     })
     if (findUser) {
-        next(new Error("User already Exsits"), { cause: 409 })
+        next(new Error("User already Exsits",{ cause: 409 }))
         return
     }
     if (password) {
@@ -39,7 +39,7 @@ export const signup = asyncHandler(async (req, res, next) => {
         req.body.password = n_password
     }
     else {
-        next(new Error("there is no passowrd"), { cause: 400 })
+        next(new Error("there is no passowrd", { cause: 400 }))
         return
     }
     if (req.body.email) {
