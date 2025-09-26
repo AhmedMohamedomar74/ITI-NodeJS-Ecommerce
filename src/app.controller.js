@@ -16,27 +16,25 @@ async function bootstrap() {
   dotenv.config({
     path: path.resolve("./config/dev.env"),
   });
-  const port = process.env.PORT;
+  const port = process.env.PORT || 5000;
   const app = express();
 
-  app.use(cors({
-    origin: "*", // Allow all origins
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
-    credentials: true
-  }));
+  app.use(cors());
 
   // DB
   testConnection();
+  app.get('/', (req, res) => {
+    res.json({ message: 'ITI Ecommerce API is running!' });
+  });
   app.use(express.json());
   app.use("/images", express.static("images"));
   app.use("/auth", authRoute);
   app.use("/user", userRoute);
-  app.use("/products",productRoute);
-  app.use("/category",categoryRouter)
-  app.use("/orders", orderRouter); 
-  app.use("/",cartRouter);
-  app.use("/payment",paymentRoute)
+  app.use("/products", productRoute);
+  app.use("/category", categoryRouter)
+  app.use("/orders", orderRouter);
+  app.use("/", cartRouter);
+  app.use("/payment", paymentRoute)
   app.use(glopalErrorHandling);
   app.listen(port, () => {
     console.log(`Server is running on port = ${port}`);
