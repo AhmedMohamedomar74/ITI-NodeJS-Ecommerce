@@ -114,8 +114,8 @@ async function orderRequest(value) {
             }
         ],
         application_context: {
-            return_url: `${process.env.BASE_URL}:${process.env.PORT}/api/v1/payment/confirmOrder`,
-            cancel_url: `${process.env.BASE_URL}:${process.env.PORT}/cancel`,
+            return_url: `${process.env.BASE_URL}/api/v1/payment/confirmOrder`,
+            cancel_url: `${process.env.BASE_URL}/cancel`,
             shipping_preference: 'NO_SHIPPING',
             user_action: 'PAY_NOW',
             brand_name: 'ITI Mearn Stack'
