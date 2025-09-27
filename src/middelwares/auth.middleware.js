@@ -66,6 +66,6 @@ export const adminCheckmiddelware = asyncHandler(async (req,res,next)=>
     }
     else
     {
-        next(new Error("Unothrized User"),{cause:401})
+        next(new Error("Unothrized User",{cause:401}))
     }
 })
