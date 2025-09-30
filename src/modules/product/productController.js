@@ -43,8 +43,8 @@ const getProductById = asyncHandler(async (req, res, next) => {
 
 //POST ==> create new product
 const createProduct = asyncHandler(async (req, res, next) => {
-  if (req.file) {
-    req.body.images = [req.file.filename];
+  if (req.body.imageUrl) {
+    req.body.images = [req.body.imageUrl];
   }
 
   const product = await productModel.create(req.body);
