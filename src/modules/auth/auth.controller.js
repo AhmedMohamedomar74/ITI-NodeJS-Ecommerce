@@ -32,11 +32,7 @@ export const signup = asyncHandler(async (req, res, next) => {
         }
     })
     if (findUser) {
-<<<<<<< HEAD
         next(new Error("User already Exsits",{ cause: 409 }))
-=======
-        next(new Error("User already Exsits", { cause: 409 }))
->>>>>>> devolvement
         return
     }
     if (password) {
