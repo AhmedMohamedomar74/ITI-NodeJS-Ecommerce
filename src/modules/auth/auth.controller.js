@@ -22,6 +22,7 @@ export const signup = asyncHandler(async (req, res, next) => {
 
 
     const { password, email, userName } = req.body
+    console.log({ password, email, userName })
     const findUser = await findOne({
         model: userModel, filter: {
             $or: [
@@ -31,7 +32,7 @@ export const signup = asyncHandler(async (req, res, next) => {
         }
     })
     if (findUser) {
-        next(new Error("User already Exsits"), { cause: 409 })
+        next(new Error("User already Exsits", { cause: 409 }))
         return
     }
     if (password) {
@@ -39,7 +40,7 @@ export const signup = asyncHandler(async (req, res, next) => {
         req.body.password = n_password
     }
     else {
-        next(new Error("there is no passowrd"), { cause: 400 })
+        next(new Error("there is no passowrd", { cause: 400 }))
         return
     }
     if (req.body.email) {
@@ -56,6 +57,7 @@ export const signup = asyncHandler(async (req, res, next) => {
 
 export const login = asyncHandler(async (req, res, next) => {
     const tokens = generateAuthTokens(req.user);
+    console.log({tokens})
     successResponce({ res, data: tokens.accessToken });
 })
 
