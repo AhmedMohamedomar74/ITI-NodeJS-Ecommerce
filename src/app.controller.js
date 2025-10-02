@@ -15,7 +15,7 @@ import wishlistRouter from "./modules/wishlist/wishlist.route.js";
 
 async function bootstrap() {
   dotenv.config({
-    path: path.resolve(""),
+    // path: path.resolve(""),
   });
   const port = process.env.PORT || 5000;
   const app = express();
