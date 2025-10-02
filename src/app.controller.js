@@ -35,7 +35,7 @@ async function bootstrap() {
     res.json({ message: "ITI Ecommerce API is running!" });
   });
   app.use(express.json());
-  app.use("/images", express.static(path.resolve("src/images")));
+  app.use("/images", express.static("images"));
   app.use("/auth", authRoute);
   app.use("/user", userRoute);
   app.use("/products", productRoute);
