@@ -260,7 +260,7 @@ export const sendEmail = ({from = process.env.GOOGLE_EMAIL , subject  = "" , to 
 
 export const template = (email) => {
   // const encodedEmail = encodeURIComponent(email);
-  const verifyUrl = `https://iti-node-js-ecommerce.vercel.app/auth/verify/${email}`;
+  const verifyUrl = `${process.env.BASE_URL}/auth/verify/${email}`;
   
   return `
 <!DOCTYPE html>

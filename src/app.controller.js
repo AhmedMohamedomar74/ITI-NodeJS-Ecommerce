@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 import { glopalErrorHandling } from "./utils/glopalErrorHandling.js";
 import orderRouter from "./modules/orders/orders.route.js";
 import cors from "cors"; // Import cors package
+import wishlistRouter from "./modules/wishlist/wishlist.route.js";
 
 async function bootstrap() {
   dotenv.config({
@@ -42,6 +43,7 @@ async function bootstrap() {
   app.use("/orders", orderRouter);
   app.use("/", cartRouter);
   app.use("/payment", paymentRoute);
+  app.use("/wishlist",wishlistRouter)
   app.use(glopalErrorHandling);
   app.listen(port, () => {
     console.log(`Server is running on port = ${port}`);
