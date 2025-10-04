@@ -102,25 +102,28 @@ export const getWishlist = asyncHandler(async (req, res, next) => {
             }
         })
         .populate("userId", "name email userName");
-
+    console.log({ wishlist });
     if (!wishlist) {
-        return successResponce({ 
-            res, 
-            message: "Wishlist is empty", 
-            data: { items: [] } 
+        return successResponce({
+            res,
+            message: "Wishlist is empty",
+            data: { items: [] }
         });
     }
 
     // Transform the data to return products directly in items array
-    const transformedItems = wishlist.items.map(item => ({
-        ...item.productId.toObject(), // Spread the product details
-        wishlistItemId: item._id // Keep the wishlist item ID if needed
-    }));
+    const transformedItems = wishlist.items
+        .filter(item => item.productId) // Remove items with deleted products
+        .map(item => ({
+            ...item.productId.toObject(), // Spread the product details
+            wishlistItemId: item._id // Keep the wishlist item ID if needed
+        }));
 
-    return successResponce({ 
-        res, 
-        message: "Wishlist retrieved successfully", 
-        data: { items: transformedItems } 
+
+    return successResponce({
+        res,
+        message: "Wishlist retrieved successfully",
+        data: { items: transformedItems }
     });
 });
 
